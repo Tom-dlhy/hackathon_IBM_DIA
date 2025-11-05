@@ -1,0 +1,13 @@
+[project]
+name = "hackathon-ibm-dia"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "dotenv>=0.9.9",
+    "pandas>=2.3.3",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+    "streamlit>=1.51.0",
+]
