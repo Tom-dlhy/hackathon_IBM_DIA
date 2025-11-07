@@ -113,11 +113,12 @@ Les données persistantes sont stockées dans les volumes Docker suivants :
 
 Docling est un service de conversion et de traitement de documents qui prend en charge :
 
-- **Formats supportés** : PDF, DOCX, PPTX, HTML, Images
+- **Formats supportés** : PDF, DOCX, PPTX, HTML, Images, XLSX, etc..
 - **Fonctionnalités** : Extraction de texte, extraction de tableaux, OCR
 - **API** : <http://localhost:5001>
 - **Documentation** : <http://localhost:5001/docs>
 - **Interface UI** : <http://localhost:5001/ui>
 
 Le service Docling est automatiquement lié à Open WebUI via la variable d'environnement `DOCLING_API_URL`.
+
 
