@@ -1,60 +1,105 @@
-# Welcome to the IBM Hackathon! 🎉
+# Hackathon Open WebUI
 
-This repository serves as a template to help you get started quickly.  
-Follow the project structure, fork the repo, and clone it locally to begin.
+Stack Docker Compose pour Open WebUI avec intégration IBM watsonx.ai via LiteLLM.
 
----
+## Architecture
 
-## 1. Fork the Repository
+- **Open WebUI** : Interface utilisateur web (port 3000)
+- **PostgreSQL** : Base de données principale
+- **Redis** : Cache et gestion WebSocket
+- **Qdrant** : Base de données vectorielle
+- **LiteLLM** : Proxy OpenAI-compatible pour IBM watsonx.ai
 
-1. Click **Fork** (top right) to create a copy under your own account
-2. Make sure the fork is **public**  
-   If it isn't, go to:  
-   **Settings → Change repository visibility → Public**
+## Configuration
 
----
+### Variables watsonx.ai à modifier
 
-## 2. Clone the Repository
+**IMPORTANT** : Avant de lancer la stack, vous devez modifier les variables IBM watsonx.ai dans le fichier [docker-compose.yml](docker-compose.yml) (lignes 46-49) :
 
-Once you have forked the repository:
-
-```bash
-# Clone your fork (replace <your-user> and <repo> with your info)
-git clone https://github.com/<your-user>/<repo>.git
-
-# Move into the project folder
-cd <repo>
+```yaml
+environment:
+  WATSONX_URL: "https://eu-de.ml.cloud.ibm.com"
+  WATSONX_APIKEY: "VOTRE_CLÉ_API"
+  WATSONX_API_KEY: "VOTRE_CLÉ_API"
+  WATSONX_PROJECT_ID: "VOTRE_PROJECT_ID"
 ```
 
----
+Remplacez :
+- `WATSONX_APIKEY` et `WATSONX_API_KEY` : Votre clé API IBM Cloud
+- `WATSONX_PROJECT_ID` : L'ID de votre projet watsonx.ai
+- `WATSONX_URL` : L'URL de votre région (par défaut : eu-de)
 
-## 3. Contribute
+## Lancement de la stack
 
-### Create a new branch for each feature or fix:
+### Prérequis
 
+- Docker
+- Docker Compose
+
+### Démarrage
+
+1. Cloner le repository :
 ```bash
-git checkout -b feature/my-awesome-feature
+git clone <url-du-repo>
+cd hackathon-openwebui
 ```
 
-### Commit your changes:
+2. Modifier les variables watsonx.ai dans [docker-compose.yml](docker-compose.yml)
 
+3. Lancer la stack :
 ```bash
-git add .
-git commit -m "Add: my awesome feature"
-git push origin feature/my-awesome-feature
+docker-compose up -d
 ```
 
----
+4. Vérifier que tous les services sont démarrés :
+```bash
+docker-compose ps
+```
 
-## 4. Quick Rules
+5. Accéder à l'interface :
+```
+http://localhost:3000
+```
 
-✅ Keep your fork **public** during the hackathon  
-✅ Follow the **template's structure**  
-❓ For any questions: contact **kryptosphere@devinci.fr**
+### Arrêt
 
----
+```bash
+docker-compose down
+```
 
-## 5. Have Fun and Good Luck!
+### Arrêt avec suppression des volumes
 
-Good luck during the IBM Hackathon — build, learn, and most importantly: **have fun!** 🚀
+```bash
+docker-compose down -v
+```
 
+## Ports utilisés
+
+- **3000** : Open WebUI
+- **5432** : PostgreSQL
+- **6379** : Redis
+- **6333** : Qdrant API
+- **6334** : Qdrant gRPC
+- **4000** : LiteLLM
+
+## Logs
+
+Pour consulter les logs d'un service :
+
+```bash
+docker-compose logs -f <service>
+```
+
+Exemples :
+```bash
+docker-compose logs -f openwebui
+docker-compose logs -f litellm
+```
+
+## Volumes
+
+Les données persistantes sont stockées dans les volumes Docker suivants :
+- `openwebui_data` : Données Open WebUI
+- `pg_data` : Base de données PostgreSQL
+- `redis_data` : Données Redis
+- `qdrant_data` : Base de données vectorielle Qdrant
