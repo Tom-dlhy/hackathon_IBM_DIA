@@ -1,0 +1,92 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: webui
+      POSTGRES_USER: webui
+      POSTGRES_PASSWORD: change_me_pg
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webui -d webui"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redis_data:/data
+    ports: ["6379:6379"]
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm
+    restart: unless-stopped
+    # expose l’API OpenAI-compatible sur :4000
+    command: ["--config", "/etc/litellm/config.yaml", "--port", "4000"]
+    environment:
+      # --- IBM watsonx.ai (LiteLLM) ---
+      WATSONX_URL: "https://eu-de.ml.cloud.ibm.com"
+      WATSONX_APIKEY: "API_KEY"
+      WATSONX_API_KEY: "API_KEY"
+      WATSONX_PROJECT_ID: "PROJECT_ID"
+    volumes:
+      - ./litellm.config.yaml:/etc/litellm/config.yaml:ro
+    ports: ["4000:4000"]
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+      - litellm
+    ports:
+      - "3000:8080"
+    environment:
+      ENV: prod
+      PORT: "8080"
+      WEBUI_URL: "http://localhost:3000"
+
+      # --- Base de données principale ---
+      DATABASE_URL: "postgres://webui:change_me_pg@postgres:5432/webui"
+
+      # --- Vector DB: Qdrant ---
+      VECTOR_DB: "qdrant"
+      QDRANT_URI: "http://qdrant:6333"
+
+      # --- Redis + WebSocket (scaling/cluster) ---
+      REDIS_URL: "redis://redis:6379/0"
+      WEBSOCKET_MANAGER: "redis"
+      WEBSOCKET_REDIS_URL: "redis://redis:6379/1"
+
+      # --- OpenAI-compatible via LiteLLM ---
+      OPENAI_API_KEY: "anything"
+      OPENAI_API_BASE_URL: "http://litellm:4000"
+    volumes:
+      - openwebui_data:/app/backend/data
+
+volumes:
+  openwebui_data:
+  pg_data:
+  redis_data:
+  qdrant_data:
