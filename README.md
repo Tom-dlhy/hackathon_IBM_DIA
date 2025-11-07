@@ -9,6 +9,7 @@ Stack Docker Compose pour Open WebUI avec intégration IBM watsonx.ai via LiteLL
 - **Redis** : Cache et gestion WebSocket
 - **Qdrant** : Base de données vectorielle
 - **LiteLLM** : Proxy OpenAI-compatible pour IBM watsonx.ai
+- **Docling** : Service de traitement et conversion de documents (PDF, DOCX, PPTX, etc.)
 
 ## Configuration
 
@@ -81,6 +82,7 @@ docker-compose down -v
 - **6333** : Qdrant API
 - **6334** : Qdrant gRPC
 - **4000** : LiteLLM
+- **5001** : Docling API
 
 ## Logs
 
@@ -94,6 +96,7 @@ Exemples :
 ```bash
 docker-compose logs -f openwebui
 docker-compose logs -f litellm
+docker-compose logs -f docling
 ```
 
 ## Volumes
@@ -103,3 +106,17 @@ Les données persistantes sont stockées dans les volumes Docker suivants :
 - `pg_data` : Base de données PostgreSQL
 - `redis_data` : Données Redis
 - `qdrant_data` : Base de données vectorielle Qdrant
+
+## Services et APIs
+
+### Docling - Traitement de documents
+
+Docling est un service de conversion et de traitement de documents qui prend en charge :
+
+- **Formats supportés** : PDF, DOCX, PPTX, HTML, Images
+- **Fonctionnalités** : Extraction de texte, extraction de tableaux, OCR
+- **API** : <http://localhost:5001>
+- **Documentation** : <http://localhost:5001/docs>
+- **Interface UI** : <http://localhost:5001/ui>
+
+Le service Docling est automatiquement lié à Open WebUI via la variable d'environnement `DOCLING_API_URL`.
