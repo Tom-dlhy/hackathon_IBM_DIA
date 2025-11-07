@@ -1,6 +1,6 @@
-# Hackathon Open WebUI
+# Hackathon IBM
 
-Stack Docker Compose pour Open WebUI avec intégration IBM watsonx.ai via LiteLLM.
+Stack Docker Compose pour RAG pour le Pôle Léonard de Vinci avec intégration IBM watsonx.ai via LiteLLM.
 
 ## Architecture
 
@@ -120,3 +120,4 @@ Docling est un service de conversion et de traitement de documents qui prend en 
 - **Interface UI** : <http://localhost:5001/ui>
 
 Le service Docling est automatiquement lié à Open WebUI via la variable d'environnement `DOCLING_API_URL`.
+
